@@ -958,7 +958,7 @@ canvas.addEventListener("mousemove", function(e) {
 // RADIO ROOM LOG
 // ==========================================
 function startChat() {
-    document.getElementById("help-text").innerText = "Radio room active. Any user can clear messages.";
+    document.getElementById("help-text").innerText = "Welcome to ze Radio Room";
     renderChat();
     setTimeout(function() {
         var inp = document.getElementById("chat-input");
