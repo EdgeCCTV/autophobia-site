@@ -1,0 +1,115 @@
+body {
+    background-color: #202020;
+    color: #ffffff;
+    font-family: sans-serif;
+    text-align: center;
+    margin-top: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+#account-bar {
+    background-color: #2e2e2e;
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    border: 1px solid #444;
+}
+
+#game-buttons {
+    margin-bottom: 15px;
+}
+
+button {
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #666;
+    padding: 6px 12px;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+button:hover {
+    background-color: #555555;
+}
+
+#stats {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+canvas {
+    background-color: #000000;
+    border: 2px solid #555555;
+    display: block;
+    margin: 0 auto;
+}
+
+#help-text {
+    color: #aaaaaa;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+input {
+    background-color: #111111;
+    color: white;
+    border: 1px solid #555555;
+    padding: 4px;
+    border-radius: 2px;
+}
+
+/* RADIO ROOM / CHAT PANEL */
+#chat-panel {
+    width: 300px;
+    margin: 0 auto;
+    background: #111111;
+    border: 2px solid #555555;
+    padding: 10px;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+#chat-messages {
+    height: 230px;
+    overflow-y: auto;
+    background: #000000;
+    border: 1px solid #333333;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.chat-msg {
+    margin-bottom: 6px;
+    word-break: break-word;
+}
+
+.chat-sender {
+    color: #2ed573;
+    font-weight: bold;
+}
+
+.chat-time {
+    color: #777777;
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+#clear-btn {
+    background-color: #d63031;
+    border-color: #ff7675;
+}
+
+#clear-btn:hover {
+    background-color: #b71515;
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- Public site file. Lives in docs/ of the private game repo. Copy docs/ to the root of EdgeCCTV/autophobia-site to update https://autophobia.me/. -->
+<html>
+<head>
+    <title>My Mini Games</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <a href="index.html" style="color: #888888; text-decoration: none; font-size: 13px; display: inline-block; margin-bottom: 8px;">⬅ Back to Home</a>
+    <h1>🎮 My Mini Games</h1>
+
+    <!-- account section -->
+    <div id="account-bar">
+        <span id="user-status">User: Guest</span> |
+        <input type="text" id="uname" placeholder="username" size="9">
+        <input type="password" id="pword" placeholder="password" size="9">
+        <button onclick="login()">Login</button>
+        <button onclick="signup()">Sign Up</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- game picker buttons -->
+    <div id="game-buttons">
+        <button onclick="play('snake')">Snake</button>
+        <button onclick="play('tetris')">Tetris</button>
+        <button onclick="play('breakout')">Breakout</button>
+        <button onclick="play('memory')">Memory</button>
+        <button onclick="play('mines')">Minesweeper</button>
+        <!-- hidden chat room button (only appears for authorized accounts) -->
+        <button id="secret-btn" style="display: none;" onclick="play('chat')">Radio Room</button>
+    </div>
+
+    <!-- score board -->
+    <div id="stats">
+        <span id="game-name">Select a game above</span> |
+        Score: <span id="score">0</span> |
+        Best: <span id="best">0</span>
+    </div>
+
+    <!-- single canvas used for all games -->
+    <canvas id="c" width="300" height="300"></canvas>
+
+    <!-- hidden room panel -->
+    <div id="chat-panel" style="display: none;">
+        <div id="chat-messages"></div>
+        <div id="chat-controls">
+            <input type="text" id="chat-input" placeholder="Broadcast message..." size="20">
+            <button onclick="sendChatMessage()">Send</button>
+            <button onclick="clearChatLog()" id="clear-btn">Clear</button>
+        </div>
+    </div>
+
+    <p id="help-text">Click any game button to play!</p>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,22 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- Public site file. Live at https://autophobia.me/ only after this docs/ folder is copied to the root of EdgeCCTV/autophobia-site and pushed. Do not delete the game at the top of the private repo. -->
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
     <title>Autophobia</title>
-    <meta name="description" content="Autophobia, a game by Johnny. Still being built.">
-    <link rel="icon" type="image/png" href="sprites/agent.png">
-    <link rel="stylesheet" href="landing.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 100px;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 38px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        p.wip-text {
+            font-size: 18px;
+            color: #aaaaaa;
+            max-width: 600px;
+            margin: 0 auto 35px auto;
+            line-height: 1.5;
+        }
+
+        .hub-link {
+            text-decoration: none;
+        }
+
+        .hub-btn {
+            background-color: #333333;
+            color: #ffffff;
+            border: 2px solid #555555;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .hub-btn:hover {
+            background-color: #4df0a0;
+            color: #111111;
+            border-color: #4df0a0;
+        }
+
+        .footer {
+            margin-top: 80px;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <main>
-        <img class="hero" src="sprites/agent.png" alt="">
-        <h1>Autophobia</h1>
-        <p class="by">A game by Johnny</p>
-        <p class="status">Still being built.</p>
-        <div class="cast" aria-hidden="true">
-            <img src="sprites/wisp.png" alt="">
-        </div>
-    </main>
+
+    <!-- main header -->
+    <h1>AUTOPHOBIA</h1>
+
+    <!-- wip message -->
+    <p class="wip-text">
+        Autophobia itself is a Work in progress, Maybe try these Other things I made!
+    </p>
+
+    <!-- button leading to games page -->
+    <a href="games.html" class="hub-link">
+        <button class="hub-btn">🎮 Play My Mini Game Hub</button>
+    </a>
+
+    <div class="footer">
+        autophobia.me
+    </div>
+
 </body>
 </html>
