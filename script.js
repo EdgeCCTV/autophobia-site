@@ -41,7 +41,7 @@ var currentUser = localStorage.getItem("game_user") || "Guest";
 // accounts that can open the radio log
 var RADIO_USERS = [
     "Fish",
-    "leonardowe9s",
+    "Green",
     "Eight Handled Sword Divergent Sila Divine General, Arcangel and World Slayer Reality Destroyer Judgemental: Radio",
     "Player4" // 4th future user
 ];
