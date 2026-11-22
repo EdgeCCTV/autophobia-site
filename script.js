@@ -6,7 +6,36 @@ var score = 0;
 var gameTimer = null;
 var gameRunning = false;
 
-// ACCOUNTS (stored in localStorage)
+// ==========================================
+// FIREBASE CONFIG (Connected to Autophobia Project)
+// ==========================================
+var firebaseConfig = {
+    apiKey: "AIzaSyDntowtTBTyLFFzO_nVRZvxXNdtgB3J4uk",
+    authDomain: "autophobia-project.firebaseapp.com",
+    databaseURL: "https://autophobia-project-default-rtdb.firebaseio.com",
+    projectId: "autophobia-project",
+    storageBucket: "autophobia-project.appspot.com",
+    messagingSenderId: "839741928303",
+    appId: "1:839741928303:web:7ac2f083ec042108da6e9a"
+};
+
+var db = null;
+try {
+    if (typeof firebase !== "undefined" && firebaseConfig.apiKey !== "PASTE_API_KEY_HERE") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        // console.log("firebase connected!");
+    }
+} catch(err) {
+    // console.log("firebase not initialized yet");
+}
+
+// helper: firebase keys cannot have certain characters
+function dbKey(name) {
+    return name.replace(/[.#$\[\]\/]/g, '_');
+}
+
+// ACCOUNTS
 var currentUser = localStorage.getItem("game_user") || "Guest";
 
 // accounts that can open the radio log
@@ -22,6 +51,10 @@ function isRadioUser() {
 }
 
 updateUserDisplay();
+if (db) {
+    loadCloudScores();
+    initRadioListener();
+}
 
 function updateUserDisplay() {
     document.getElementById("user-status").innerText = "User: " + currentUser;
@@ -48,30 +81,77 @@ function signup() {
         alert("Enter username and password first!");
         return;
     }
-    var users = JSON.parse(localStorage.getItem("game_accounts") || "{}");
-    if (users[u]) {
-        alert("Username already taken!");
-        return;
+
+    if (db) {
+        var key = dbKey(u);
+        db.ref("users/" + key).once("value", function(snap) {
+            if (snap.exists()) {
+                alert("This username is already taken!");
+            } else {
+                db.ref("users/" + key).set({
+                    username: u,
+                    password: p,
+                    scores: { snake: 0, tetris: 0, breakout: 0, memory: 0, mines: 0 }
+                }, function(err) {
+                    if (err) {
+                        alert("Error creating account: " + err.message);
+                    } else {
+                        currentUser = u;
+                        localStorage.setItem("game_user", u);
+                        updateUserDisplay();
+                        alert("Account created and logged in!");
+                    }
+                });
+            }
+        });
+    } else {
+        // fallback to local storage
+        var users = JSON.parse(localStorage.getItem("game_accounts") || "{}");
+        if (users[u]) {
+            alert("Username already taken!");
+            return;
+        }
+        users[u] = p;
+        localStorage.setItem("game_accounts", JSON.stringify(users));
+        currentUser = u;
+        localStorage.setItem("game_user", u);
+        updateUserDisplay();
+        alert("Account created locally!");
     }
-    users[u] = p;
-    localStorage.setItem("game_accounts", JSON.stringify(users));
-    currentUser = u;
-    localStorage.setItem("game_user", u);
-    updateUserDisplay();
-    alert("Account created and logged in!");
 }
 
 function login() {
     var u = document.getElementById("uname").value.trim();
     var p = document.getElementById("pword").value.trim();
-    var users = JSON.parse(localStorage.getItem("game_accounts") || "{}");
-    if (users[u] && users[u] === p) {
-        currentUser = u;
-        localStorage.setItem("game_user", u);
-        updateUserDisplay();
-        alert("Logged in!");
+    if (u === "" || p === "") {
+        alert("Enter username and password first!");
+        return;
+    }
+
+    if (db) {
+        var key = dbKey(u);
+        db.ref("users/" + key).once("value", function(snap) {
+            if (snap.exists() && snap.val().password === p) {
+                currentUser = u;
+                localStorage.setItem("game_user", u);
+                updateUserDisplay();
+                loadCloudScores();
+                alert("Logged in!");
+            } else {
+                alert("Wrong username or password!");
+            }
+        });
     } else {
-        alert("Wrong username or password!");
+        // fallback to local storage
+        var users = JSON.parse(localStorage.getItem("game_accounts") || "{}");
+        if (users[u] && users[u] === p) {
+            currentUser = u;
+            localStorage.setItem("game_user", u);
+            updateUserDisplay();
+            alert("Logged in!");
+        } else {
+            alert("Wrong username or password!");
+        }
     }
 }
 
@@ -79,6 +159,19 @@ function logout() {
     currentUser = "Guest";
     localStorage.removeItem("game_user");
     updateUserDisplay();
+}
+
+function loadCloudScores() {
+    if (db && currentUser !== "Guest") {
+        var key = dbKey(currentUser);
+        db.ref("users/" + key + "/scores").once("value", function(snap) {
+            var cloudScores = snap.val() || {};
+            for (var g in cloudScores) {
+                localStorage.setItem(currentUser + "_" + g, cloudScores[g]);
+            }
+            updateBestDisplay();
+        });
+    }
 }
 
 function getBest(game) {
@@ -90,6 +183,12 @@ function saveBest(game, s) {
     if (s > old) {
         localStorage.setItem(currentUser + "_" + game, s);
         document.getElementById("best").innerText = s;
+
+        // sync to firebase cloud
+        if (db && currentUser !== "Guest") {
+            var key = dbKey(currentUser);
+            db.ref("users/" + key + "/scores/" + game).set(s);
+        }
     }
 }
 
@@ -861,18 +960,35 @@ canvas.addEventListener("mousemove", function(e) {
 function startChat() {
     document.getElementById("help-text").innerText = "Radio room active. Any user can clear messages.";
     renderChat();
-    // focus input
     setTimeout(function() {
         var inp = document.getElementById("chat-input");
         if (inp) inp.focus();
     }, 50);
 }
 
+// listen for live messages from all 4 computers
+function initRadioListener() {
+    if (db) {
+        db.ref("radio_log").on("value", function(snap) {
+            var data = snap.val();
+            var list = [];
+            if (data) {
+                for (var id in data) {
+                    list.push(data[id]);
+                }
+            }
+            localStorage.setItem("radio_log", JSON.stringify(list));
+            if (currentGame === "chat") {
+                renderChat();
+            }
+        });
+    }
+}
+
 function getChatMessages() {
     try {
         return JSON.parse(localStorage.getItem("radio_log") || "[]");
     } catch(e) {
-        // console.log("reset corrupt chat log");
         return [];
     }
 }
@@ -897,7 +1013,7 @@ function renderChat() {
         html += "</div>";
     }
     box.innerHTML = html;
-    box.scrollTop = box.scrollHeight; // scroll to bottom
+    box.scrollTop = box.scrollHeight; // auto scroll
 }
 
 function sendChatMessage() {
@@ -905,23 +1021,33 @@ function sendChatMessage() {
     var val = inp.value.trim();
     if (val === "") return;
 
-    var list = getChatMessages();
     var now = new Date();
     var timeStr = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
 
-    list.push({
+    var msg = {
         sender: currentUser,
         text: val,
         time: timeStr
-    });
+    };
 
-    localStorage.setItem("radio_log", JSON.stringify(list));
+    if (db) {
+        // pushes live to cloud across all computers
+        db.ref("radio_log").push(msg);
+    } else {
+        var list = getChatMessages();
+        list.push(msg);
+        localStorage.setItem("radio_log", JSON.stringify(list));
+        renderChat();
+    }
+
     inp.value = "";
-    renderChat();
 }
 
 function clearChatLog() {
     if (confirm("Clear all radio transmissions?")) {
+        if (db) {
+            db.ref("radio_log").remove();
+        }
         localStorage.removeItem("radio_log");
         renderChat();
     }
